@@ -24,7 +24,7 @@ FROM gcr.io/distroless/base
 
 WORKDIR /app
 
-RUN mkdir -p storage drive && \
+RUN mkdir -p storage drive logs && \
     touch logs/server.log && \
     chown -R bun:bun /app && \
     chmod -R 755 storage drive && \
