@@ -24,10 +24,6 @@ FROM gcr.io/distroless/base
 
 WORKDIR /app
 
-COPY --from=build /app/server server
-COPY --from=build /app/storage ./storage
-COPY --from=build /app/drive ./drive
-
 RUN mkdir -p storage drive && \
     touch logs/server.log && \
     chown -R bun:bun /app && \
