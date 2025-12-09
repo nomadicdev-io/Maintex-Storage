@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Security -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/public/ms-icon-144x144.png">
+    <meta name="theme-color" content="#0d0f12">
+    <title>Maintex Storage API</title>
+    <link rel="apple-touch-icon" sizes="57x57" href="/public/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/public/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/public/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/public/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/public/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/public/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/public/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/public/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/public/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/public/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/public/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png">
+    <link rel="manifest" href="/public/manifest.json">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Maintex Storage - File Upload & Sharing Server">
+    <meta name="description" content="Secure file storage, upload, and sharing platform. Upload, manage, and share your files with ease.">
+    <meta name="keywords" content="file storage, file upload, file sharing, cloud storage, file management, Maintex Storage">
+    <meta name="author" content="MaintexPro">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:title" content="Maintex Storage - File Upload & Sharing Server">
+    <meta property="og:description" content="Secure file storage, upload, and sharing platform. Upload, manage, and share your files with ease.">
+    <meta property="og:image" content="">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="">
+    <meta property="twitter:title" content="Maintex Storage - File Upload & Sharing Server">
+    <meta property="twitter:description" content="Secure file storage, upload, and sharing platform. Upload, manage, and share your files with ease.">
+    <meta property="twitter:image" content="">
+
+    <style>
+        :root {
+            color-scheme: dark;
+            font-family: "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+            --bg-primary: #0d0f12;
+            --bg-secondary: #13161c;
+            --bg-accent: rgba(108, 117, 125, 0.35);
+            --text-primary: #f1f5f9;
+            --text-secondary: rgba(226, 232, 240, 0.72);
+            --highlight: #7f8cff;
+            --shadow: rgba(15, 18, 25, 0.75);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(120% 120% at 50% 0%, rgb(91 91 91 / 20%), transparent 60%), radial-gradient(80% 80% at 100% 100%, rgb(108 108 108 / 12%), transparent 60%), #141414;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            padding: 3rem 1.5rem;
+        }
+
+        .background-aurora {
+            position: absolute;
+            inset: -20vmax;
+            pointer-events: none;
+            filter: blur(80px) saturate(140%);
+            opacity: 0.8;
+            transform: translateZ(0);
+        }
+
+        .background-aurora span {
+            position: absolute;
+            width: 28vmax;
+            height: 28vmax;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(134, 142, 150, 0.35), transparent 65%);
+            animation: float 18s ease-in-out infinite;
+        }
+
+        .background-aurora span:nth-child(2) {
+            top: 35%;
+            left: 60%;
+            animation-delay: -6s;
+            background: radial-gradient(circle at 40% 40%, rgba(148, 163, 184, 0.3), transparent 60%);
+        }
+
+        .background-aurora span:nth-child(3) {
+            top: 65%;
+            left: 10%;
+            animation-delay: -12s;
+            background: radial-gradient(circle at 50% 40%, rgba(82, 106, 122, 0.35), transparent 70%);
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate3d(-10%, -10%, 0) scale(0.95);
+            }
+            50% {
+                transform: translate3d(10%, 12%, 0) scale(1.05);
+            }
+        }
+
+        .hero {
+            position: relative;
+            width: min(520px, 100%);
+            padding: 2.75rem;
+            backdrop-filter: blur(22px);
+            background: linear-gradient(145deg, rgb(37 37 37 / 88%), rgb(21 21 21 / 72%));
+            border-radius: 28px;
+            border: 1px solid rgba(148, 163, 184, 0.08);
+            box-shadow: 0 25px 70px rgb(26 26 26 / 75%);
+            display: grid;
+            gap: 1.75rem;
+            z-index: 1;
+        }
+
+        .logo {
+            width: min(350px, 70%);
+            margin-inline: auto;
+            display: block;
+            filter: drop-shadow(0 18px 45px rgba(73, 84, 102, 0.45));
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 2.85rem);
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.01em;
+        }
+
+        p {
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            text-align: center;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .url-block {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.95rem 1.15rem;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            background: rgb(16 16 16 / 72%);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+        }
+
+        .url-block:hover,
+        .url-block:focus-visible {
+            border-color: rgba(197, 197, 197, 0.35);
+            background: rgba(43, 43, 43, 0.95);
+            transform: translateY(-2px);
+        }
+
+        .url-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .url-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgb(140 140 140 / 25%);
+            color: var(--text-primary);
+            flex-shrink: 0;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .url-block:hover .url-icon,
+        .url-block:focus-visible .url-icon {
+            background: rgba(77, 77, 77, 0.3);
+            color: var(--highlight);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 2.5rem 1.25rem;
+            }
+
+            .hero {
+                padding: 2.25rem;
+                border-radius: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-aurora" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <main class="hero">
+        <img class="logo" src="/public/logo-dark.svg" alt="Maintex Storage logo">
+        <!-- <h1>Secure storage, ready when you are.</h1> -->
+        <p>High-availability object storage designed for teams that expect fast throughput, resilient uptime, and effortless file delivery across Maintex infrastructure.</p>
+        <a class="url-block" href="https://storage.maintex.pro" target="_blank" rel="noopener">
+            <span class="url-text">https://storage.maintex.pro</span>
+            <span class="url-icon" aria-hidden="true">↗</span>
+        </a>
+    </main>
+</body>
+</html>
