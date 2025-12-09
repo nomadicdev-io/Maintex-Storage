@@ -1,6 +1,7 @@
 import { Elysia, file } from 'elysia';
 import fileTypes from './config/upload-types.json'
 import { minioClient } from '.';
+import { healthcheckPlugin } from 'elysia-healthcheck';
 
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
@@ -9,6 +10,15 @@ const staticRoutes = new Elysia({
 staticRoutes
 .get('/', file('public/index.html'))
 .get('/favicon.ico', file('public/favicon.ico'))
+.use(
+    healthcheckPlugin({
+      prefix: '/api/v1/health',
+      paths: {
+        liveness: '/liveness',
+        readiness: '/readiness',
+      }
+    })
+)
 
 const uploadRoutes = new Elysia({
     name: 'Maintex Storage Upload Routes',
@@ -152,6 +162,7 @@ uploadRoutes
                 bucket: bucket,
                 type: type,
                 size: size,
+                isStatic: false
             }
         }
 
