@@ -33,17 +33,15 @@ uploadRoutes
         console.log(error)
     }
 })
-.get('/uploads/file', async ({query, status}: {query: any, status: any})=> {
+.get('/uploads/file/*', async ({params, status}: {params: any, status: any})=> {
     try{
-        const {path} = query
-
-        if(!path) return status(400, {
+        if(!params) return status(400, {
             message: 'Bad Request',
             error: 'Bad Request, Path is required',
             status: false,
             code: 400
         })
-        return file(path)
+        return file(params['*'])
     }catch(error){
         console.log(error)
         return status(500, {
@@ -167,7 +165,6 @@ uploadRoutes
         })
     }
 })
-
 
 export {
     staticRoutes,
