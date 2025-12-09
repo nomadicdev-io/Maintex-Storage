@@ -29,10 +29,10 @@ services:
       - S3_BUCKET=${S3_BUCKET}
       
     volumes:
-      # Mount storage for persistent file uploads
-      - ./storage:/app/storage
-      - ./logs:/app/logs
-      - ./drive:/app/drive
+      # Mount persistent volumes for uploaded files and logs
+      - storage-data:/app/storage
+      - logs-data:/app/logs
+      - drive-data:/app/drive
     networks:
       - app-network
     # Logging configuration
@@ -52,3 +52,8 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  storage-data:
+  drive-data:
+  logs-data:
