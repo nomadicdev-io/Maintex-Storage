@@ -42,10 +42,11 @@ createStorageFolder();
 
 
 export const minioClient = new Minio.Client({
-    endPoint: process.env.MINIO_ENDPOINT as string,
-    useSSL: true,
-    accessKey: process.env.S3_ACCESS_KEY,
-    secretKey: process.env.S3_SECRET_KEY,
+    endPoint: process.env.F3_ENDPOINT as string,
+    port: parseInt(process.env.F3_PORT as string),
+    useSSL: false,
+    accessKey: process.env.F3_ACCESS_KEY,
+    secretKey: process.env.F3_SECRET_KEY,
     region: 'us-east-1'
 })
 

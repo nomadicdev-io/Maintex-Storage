@@ -119,17 +119,19 @@ uploadRoutes
 
         await Bun.write(path, file);
 
-        await sharp(path)
-        .resize(512, 512, {
-            fit: "cover",
-            position: "centre",
-        })
-        .webp({
-            quality: 82,
-            effort: 6,
-            smartSubsample: true,
-        })
-        .toFile(thumbnailPath);
+        if(file.type.includes('image')){
+            await sharp(path)
+            .resize(512, 512, {
+                fit: "cover",
+                position: "centre",
+            })
+            .webp({
+                quality: 82,
+                effort: 6,
+                smartSubsample: true,
+            })
+            .toFile(thumbnailPath);
+        }
 
         return {
             message: 'File uploaded successfully',
@@ -156,6 +158,9 @@ uploadRoutes
 })
 .post('/upload/s3', async ({body, status}: {body: any, status: any})=> {
     try{
+
+        console.log(body.file?.type)
+
         const isFiletypeValid = fileTypes.includes(body.file?.type)
         if(!isFiletypeValid) return status(415, {
             message: 'Unsupported Media Type',
@@ -164,7 +169,7 @@ uploadRoutes
             code: 415
         })        
 
-        const bucket = process.env.S3_BUCKET as string
+        const bucket = process.env.F3_BUCKET as string
         const {name, size, type} = body.file
         const key = Bun.randomUUIDv7() + '.' + name.split('.').pop();
         const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
@@ -174,19 +179,26 @@ uploadRoutes
        
         await minioClient.putObject(bucket, key, buffer, size, type)
 
-        const thumbnailBuffer = await sharp(arrayBuffer)
-        .resize(512, 512, {
-            fit: "cover",
-            position: "centre",
-        })
-        .webp({
-            quality: 82,
-            effort: 6,
-            smartSubsample: true,
-        })
-        .toBuffer();
+        if(type.includes('image')){
+            const thumbnailBuffer = await sharp(arrayBuffer)
+            .resize(512, 512, {
+                fit: "cover",
+                position: "centre",
+            })
+            .webp({
+                quality: 82,
+                effort: 6,
+                smartSubsample: true,
+            })
+            .toBuffer();
+            await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
 
-        await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
+        }
+
+        if(type.includes('video')){
+            
+        }
+
 
         return {
             status: true,
