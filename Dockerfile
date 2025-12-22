@@ -1,4 +1,4 @@
-FROM oven/bun:latest  AS build
+FROM oven/bun:1.3.5-debian  AS build
 
 WORKDIR /app
 
@@ -7,6 +7,7 @@ COPY package.json package.json
 COPY bun.lock bun.lock
 
 RUN bun install
+RUN bun install bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-arm64-gnu
 
 COPY ./app ./app
 COPY ./public ./public
