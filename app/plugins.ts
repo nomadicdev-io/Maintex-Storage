@@ -4,7 +4,7 @@ import { cors } from '@elysiajs/cors'
 import { jwt } from '@elysiajs/jwt'
 import { staticPlugin } from '@elysiajs/static'
 import chalk from 'chalk'
-import { logger } from "@rasla/logify";
+import { logger, LoggerOptions } from "@rasla/logify";
 import { serverTiming } from '@elysiajs/server-timing'
 
 const plugins = new Elysia({
@@ -21,7 +21,7 @@ plugins
         skip: ['/health', '/metrics'],
         includeIp: true,
         format: chalk.bgBlue.white('[{timestamp}]') +  chalk.bold.green(' {level}') + chalk.bold.yellow('[{method}]') + ' - ' + chalk.red('[{path}]') + ' - ' + chalk.bold.magenta('{statusCode} ') + chalk.bold.white('{ip}'),
-    })
+    } as LoggerOptions) as any
 )
 .use(serverTiming())
 .use(cors())
