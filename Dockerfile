@@ -1,4 +1,4 @@
-FROM oven/bun:1.3.5-debian  AS build
+FROM oven/bun:latest  AS build
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY package.json package.json
 COPY bun.lock bun.lock
 
 RUN bun install
-RUN bun add bun-image-turbo-darwin-x64 bun-image-turbo-linux-x64-musl bun-image-turbo-darwin-arm64
+RUN bun add bun-image-turbo-darwin-x64
 
 
 COPY ./app ./app
