@@ -27,6 +27,12 @@ services:
       - S3_ACCESS_KEY=${S3_ACCESS_KEY}
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - S3_BUCKET=${S3_BUCKET}
+      # Minio client configuration (F3_ prefix used in code)
+      - F3_ENDPOINT=${F3_ENDPOINT}
+      - F3_PORT=${F3_PORT}
+      - F3_ACCESS_KEY=${F3_ACCESS_KEY}
+      - F3_SECRET_KEY=${F3_SECRET_KEY}
+      - F3_BUCKET=${F3_BUCKET}
       
     volumes:
       # Mount persistent volumes for uploaded files and logs
