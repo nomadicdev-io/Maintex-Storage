@@ -7,6 +7,8 @@ COPY package.json package.json
 COPY bun.lock bun.lock
 
 RUN bun install
+
+# Explicitly install platform-specific native bindings for image-turbo
 RUN bun install bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-arm64-gnu
 
 COPY ./app ./app
@@ -41,7 +43,8 @@ COPY --from=build /app/storage ./storage
 COPY --from=build /app/drive ./drive
 COPY --from=build /app/logs ./logs
 
-# Copy native bindings for image-turbo
+# Create node_modules directory and copy native bindings for image-turbo
+RUN mkdir -p ./node_modules
 COPY --from=build /app/node_modules/bun-image-turbo-linux-x64-gnu ./node_modules/bun-image-turbo-linux-x64-gnu
 COPY --from=build /app/node_modules/bun-image-turbo-linux-arm64-gnu ./node_modules/bun-image-turbo-linux-arm64-gnu
 COPY --from=build /app/node_modules/bun-image-turbo ./node_modules/bun-image-turbo
