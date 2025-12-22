@@ -7,8 +7,6 @@ COPY package.json package.json
 COPY bun.lock bun.lock
 
 RUN bun install
-RUN bun add bun-image-turbo-darwin-x64
-
 
 COPY ./app ./app
 COPY ./public ./public
