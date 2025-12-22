@@ -3,6 +3,7 @@ import fileTypes from './config/upload-types.json'
 import { minioClient } from '.';
 import { healthcheckPlugin } from 'elysia-healthcheck';
 import sharp from 'sharp';
+import { readdir } from "node:fs/promises";
 
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
@@ -210,6 +211,20 @@ uploadRoutes
             status: false,
             code: 500
         })
+    }
+})
+.get('/get/all/files', async ({status}: {status: any})=> {
+    try{
+        const files =await readdir('storage', {recursive: true})
+        return {
+            status: true,
+            code: 'GET_ALL_FILES_SUCCESS',
+            statusCode: 200,
+            message: 'Get All Files Success',
+            data: files
+        }
+    }catch(error){
+        console.log(error)
     }
 })
 
