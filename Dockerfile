@@ -8,8 +8,11 @@ COPY bun.lock bun.lock
 
 RUN bun install
 
-# Explicitly install platform-specific native bindings for image-turbo
-RUN bun install bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-arm64-gnu
+# Verify and ensure platform-specific native bindings are installed
+RUN bun install bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-arm64-gnu && \
+    echo "Checking installed packages:" && \
+    ls -la /app/node_modules/ | grep bun-image-turbo && \
+    echo "Verification complete"
 
 COPY ./app ./app
 COPY ./public ./public
@@ -28,6 +31,15 @@ RUN mkdir -p storage drive logs \
     && chmod -R 755 storage drive \
     && chmod -R 775 logs
 
+# Prepare native bindings directory for copying to final stage
+# Always create the directory with at least a marker file (to avoid COPY errors)
+RUN mkdir -p /app/native-bindings && \
+    ([ -d /app/node_modules/bun-image-turbo-linux-x64-gnu ] && cp -r /app/node_modules/bun-image-turbo-linux-x64-gnu /app/native-bindings/ || echo "x64-gnu not found") && \
+    ([ -d /app/node_modules/bun-image-turbo-linux-arm64-gnu ] && cp -r /app/node_modules/bun-image-turbo-linux-arm64-gnu /app/native-bindings/ || echo "arm64-gnu not found") && \
+    ([ -d /app/node_modules/bun-image-turbo ] && cp -r /app/node_modules/bun-image-turbo /app/native-bindings/ || echo "bun-image-turbo not found") && \
+    (ls -la /app/native-bindings/ || touch /app/native-bindings/.keep) && \
+    echo "Native bindings prepared"
+
 FROM debian:bookworm-slim
 
 WORKDIR /app
@@ -43,11 +55,9 @@ COPY --from=build /app/storage ./storage
 COPY --from=build /app/drive ./drive
 COPY --from=build /app/logs ./logs
 
-# Create node_modules directory and copy native bindings for image-turbo
+# Copy native bindings for image-turbo from prepared directory
 RUN mkdir -p ./node_modules
-COPY --from=build /app/node_modules/bun-image-turbo-linux-x64-gnu ./node_modules/bun-image-turbo-linux-x64-gnu
-COPY --from=build /app/node_modules/bun-image-turbo-linux-arm64-gnu ./node_modules/bun-image-turbo-linux-arm64-gnu
-COPY --from=build /app/node_modules/bun-image-turbo ./node_modules/bun-image-turbo
+COPY --from=build /app/native-bindings/ ./node_modules/
 
 # Set timezone to Asia/Dubai
 ENV TZ=Asia/Dubai

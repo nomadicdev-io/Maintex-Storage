@@ -336,6 +336,8 @@ uploadRoutes
         console.log(error)
     }
 })
+.post('/upload/static/chunks', 'Uploaded Chunks')
+.post('/upload/static/chunks', 'Uploaded S3 Chunks')
 
 export {
     staticRoutes,
