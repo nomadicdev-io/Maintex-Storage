@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     libtiff5 \
     libwebp6 \
     libxml2 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Cache packages installation
 COPY package.json package.json

@@ -22,9 +22,9 @@ const createStorageFolder = async () => {
         mkdirSync('storage/temp');
     }
 
-    const isDriveFolderExists = existsSync('storage/drive');
+    const isDriveFolderExists = existsSync('drive');
     if(!isDriveFolderExists) {
-        mkdirSync('storage/drive');
+        mkdirSync('drive');
     }
 
     const isLogsFolderExists = existsSync('storage/logs');
