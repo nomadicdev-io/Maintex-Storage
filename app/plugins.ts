@@ -34,7 +34,10 @@ plugins
         exp: '720d'
     })
 )
-.use(staticPlugin())
+.use(staticPlugin({
+    prefix: '/public',
+    assets: 'public'
+}))
 
 export default plugins;
 
