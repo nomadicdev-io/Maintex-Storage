@@ -17,6 +17,8 @@ const staticRoutes = new Elysia({
 
 staticRoutes
 .get('/', file('public/index.html'))
+.get('/logo', file('public/logo-dark.svg'))
+.get('/server-image', file('public/server.svg'))
 .get('/favicon.ico', file('public/favicon.ico'))
 .use(
     healthcheckPlugin({
@@ -34,7 +36,6 @@ const uploadRoutes = new Elysia({
 })
 
 uploadRoutes
-.get('/logo', file('public/logo-dark.svg'))
 .get('/s3/url', async ({query, status, redirect}: {query: any, status: any, redirect: any})=> {
     try{
         const {key, bucket} = query
