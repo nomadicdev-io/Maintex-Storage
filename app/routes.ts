@@ -79,25 +79,28 @@ uploadRoutes
         code: 401
     })
 
-    if(!bearer) return status(401, {
-        message: 'Unauthorized',
-        error: 'Unauthorized, Token is required',
-        status: false,
-        code: 401
-    })
+    // if(!bearer) return status(401, {
+    //     message: 'Unauthorized',
+    //     error: 'Unauthorized, Token is required',
+    //     status: false,
+    //     code: 401
+    // })
 
-    const verify = await jwt.verify(bearer as string)
-    console.log(verify)
+    // const verify = await jwt.verify(bearer as string)
+    // console.log(verify)
 
-    if(!verify) return status(401, {
-        message: 'Unauthorized',
-        error: 'Unauthorized, Token is invalid',
-        status: false,
-        code: 401
-    })
+    // if(!verify) return status(401, {
+    //     message: 'Unauthorized',
+    //     error: 'Unauthorized, Token is invalid',
+    //     status: false,
+    //     code: 401
+    // })
 })
 .post('/upload/static', async ({body, status}: {body: any, status: any})=> {
     try{
+
+        console.log(body)
+        
         const isFiletypeValid = fileTypes.includes(body.file?.type)
         if(!isFiletypeValid) return status(415, {
             message: 'Unsupported Media Type',
@@ -107,7 +110,7 @@ uploadRoutes
         })        
         const file = body.file
         const name = Bun.randomUUIDv7() + '.' + file.name.split('.').pop();
-        const path = body.path + name || 'storage/uploads/' + name
+        const path = body.path ? body.path + name : 'storage/uploads/' + name
 
         await Bun.write(path, file);
 

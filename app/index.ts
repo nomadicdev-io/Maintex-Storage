@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia';
 import { BunAdapter } from 'elysia/adapter/bun'
-import plugins from './plugins';
+import plugins, { openapiPlugin } from './plugins';
 import { staticRoutes, uploadRoutes } from './routes';
 import * as Minio from 'minio'
 
@@ -20,6 +20,7 @@ app
 .use(plugins)
 .use(staticRoutes)
 .use(uploadRoutes)
+.use(openapiPlugin)
 // .get('/token', async ({jwt}: {jwt: any})=> {
 //     const token = await jwt.sign({
 //         id: '68c9e29876475905a9167e38',

@@ -14,6 +14,7 @@
     "@elysiajs/bearer": "^1.4.2",
     "@elysiajs/cors": "^1.4.0",
     "@elysiajs/jwt": "^1.4.0",
+    "@elysiajs/openapi": "^1.4.12",
     "@elysiajs/server-timing": "^1.4.0",
     "@elysiajs/static": "^1.4.7",
     "@rasla/logify": "^5.1.2",
