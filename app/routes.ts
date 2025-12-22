@@ -2,6 +2,7 @@ import { Elysia, file } from 'elysia';
 import fileTypes from './config/upload-types.json'
 import { minioClient } from '.';
 import { healthcheckPlugin } from 'elysia-healthcheck';
+import sharp from 'sharp';
 
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
@@ -110,9 +111,23 @@ uploadRoutes
         })        
         const file = body.file
         const name = Bun.randomUUIDv7() + '.' + file.name.split('.').pop();
+        const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
         const path = body.path ? body.path + name : 'storage/uploads/' + name
+        const thumbnailPath = body.path ? body.path + thumbnail : 'storage/uploads/' + thumbnail
 
         await Bun.write(path, file);
+
+        await sharp(path)
+        .resize(512, 512, {
+            fit: "cover",
+            position: "centre",
+        })
+        .webp({
+            quality: 82,
+            effort: 6,
+            smartSubsample: true,
+        })
+        .toFile(thumbnailPath);
 
         return {
             message: 'File uploaded successfully',
@@ -122,7 +137,8 @@ uploadRoutes
                 type: file.type,
                 size: file.size,
                 path: path,
-                isStatic: true
+                isStatic: true,
+                thumbnail: thumbnailPath
             }
         }
 
@@ -149,10 +165,26 @@ uploadRoutes
         const bucket = process.env.S3_BUCKET as string
         const {name, size, type} = body.file
         const key = Bun.randomUUIDv7() + '.' + name.split('.').pop();
+        const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
+        const thumbnailPath = 'storage/temp/' + thumbnail
         const arrayBuffer = await body.file.arrayBuffer()
         const buffer = Buffer.from(arrayBuffer)
        
         await minioClient.putObject(bucket, key, buffer, size, type)
+
+        const thumbnailBuffer = await sharp(arrayBuffer)
+        .resize(512, 512, {
+            fit: "cover",
+            position: "centre",
+        })
+        .webp({
+            quality: 82,
+            effort: 6,
+            smartSubsample: true,
+        })
+        .toBuffer();
+
+        await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
 
         return {
             status: true,
@@ -165,7 +197,8 @@ uploadRoutes
                 bucket: bucket,
                 type: type,
                 size: size,
-                isStatic: false
+                isStatic: false,
+                thumbnail: thumbnail
             }
         }
 

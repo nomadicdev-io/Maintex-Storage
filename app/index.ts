@@ -3,12 +3,50 @@ import { BunAdapter } from 'elysia/adapter/bun'
 import plugins, { openapiPlugin } from './plugins';
 import { staticRoutes, uploadRoutes } from './routes';
 import * as Minio from 'minio'
+import { existsSync, mkdirSync } from 'node:fs';
+
+const createStorageFolder = async () => {
+
+    const isStorageFolderExists = existsSync('storage');
+    if(!isStorageFolderExists) {
+        mkdirSync('storage');
+    }
+
+    const isUploadsFolderExists = existsSync('storage/uploads');
+    if(!isUploadsFolderExists) {
+        mkdirSync('storage/uploads');
+    }
+
+    const isTempFolderExists = existsSync('storage/temp');
+    if(!isTempFolderExists) {
+        mkdirSync('storage/temp');
+    }
+
+    const isDriveFolderExists = existsSync('storage/drive');
+    if(!isDriveFolderExists) {
+        mkdirSync('storage/drive');
+    }
+
+    const isLogsFolderExists = existsSync('storage/logs');
+    if(!isLogsFolderExists) {
+        mkdirSync('storage/logs');
+    }
+
+    const isAssetsFolderExists = existsSync('storage/assets');
+    if(!isAssetsFolderExists) {
+        mkdirSync('storage/assets');
+    }
+}
+
+createStorageFolder();
+
 
 export const minioClient = new Minio.Client({
-    endPoint: import.meta.env.MINIO_ENDPOINT as string,
+    endPoint: process.env.MINIO_ENDPOINT as string,
     useSSL: true,
-    accessKey: import.meta.env.S3_ACCESS_KEY,
-    secretKey: import.meta.env.S3_SECRET_KEY,
+    accessKey: process.env.S3_ACCESS_KEY,
+    secretKey: process.env.S3_SECRET_KEY,
+    region: 'us-east-1'
 })
 
 const app = new Elysia({
