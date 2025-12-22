@@ -28,6 +28,7 @@ const uploadRoutes = new Elysia({
 })
 
 uploadRoutes
+.get('/logo', file('public/logo-dark.svg'))
 .get('/s3/url', async ({query, status, redirect}: {query: any, status: any, redirect: any})=> {
     try{
         const {key, bucket} = query
