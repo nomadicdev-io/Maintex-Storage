@@ -3,43 +3,6 @@ import { BunAdapter } from 'elysia/adapter/bun'
 import plugins, { openapiPlugin } from './plugins';
 import { staticRoutes, uploadRoutes } from './routes';
 import * as Minio from 'minio'
-import { existsSync, mkdirSync } from 'node:fs';
-
-const createStorageFolder = async () => {
-
-    const isStorageFolderExists = existsSync('storage');
-    if(!isStorageFolderExists) {
-        mkdirSync('storage');
-    }
-
-    const isUploadsFolderExists = existsSync('storage/uploads');
-    if(!isUploadsFolderExists) {
-        mkdirSync('storage/uploads');
-    }
-
-    const isTempFolderExists = existsSync('storage/temp');
-    if(!isTempFolderExists) {
-        mkdirSync('storage/temp');
-    }
-
-    const isDriveFolderExists = existsSync('drive');
-    if(!isDriveFolderExists) {
-        mkdirSync('drive');
-    }
-
-    const isLogsFolderExists = existsSync('storage/logs');
-    if(!isLogsFolderExists) {
-        mkdirSync('storage/logs');
-    }
-
-    const isAssetsFolderExists = existsSync('storage/assets');
-    if(!isAssetsFolderExists) {
-        mkdirSync('storage/assets');
-    }
-}
-
-createStorageFolder();
-
 
 export const minioClient = new Minio.Client({
     endPoint: process.env.F3_ENDPOINT as string,
