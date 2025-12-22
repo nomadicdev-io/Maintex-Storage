@@ -7,7 +7,7 @@ COPY package.json package.json
 COPY bun.lock bun.lock
 
 RUN bun install
-RUN bun install --os=linux --cpu=x64 sharp
+RUN bun install --cpu=x64 --os=linux --libc=glibc sharp
 
 COPY ./app ./app
 COPY ./public ./public
