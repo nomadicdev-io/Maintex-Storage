@@ -5,11 +5,10 @@ import { healthcheckPlugin } from 'elysia-healthcheck';
 import { readdir } from "node:fs/promises";
 import { 
     transform, 
-    metadata, 
-    blurhash,
-    resize,
-    toWebp 
+    metadata,
+    resize, 
   } from 'bun-image-turbo';
+import { pdf } from "pdf-to-img";
 
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
@@ -109,20 +108,83 @@ uploadRoutes
 .post('/upload/static', async ({body, status}: {body: any, status: any})=> {
     try{
 
-        console.log(body)
+        const isFiletypeValid = fileTypes.includes(body.file?.type)
+        
+        if(!isFiletypeValid) return status(415, {
+            message: 'Unsupported Media Type',
+            error: 'Now Allowed',
+            status: false,
+            code: 415
+        })        
              
         const file = body.file
         const name = Bun.randomUUIDv7() + '.' + file.name.split('.').pop();
-        const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
         const path = body.path ? body.path + name : 'storage/uploads/' + name
+        const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
         const thumbnailPath = body.path ? body.path + thumbnail : 'storage/uploads/' + thumbnail
 
-        const CONFIG = {
-            maxFileSize: 10 * 1024 * 1024, // 10MB
-            thumbnail: { width: 300, height: 300 },
-            webp: { quality: 85 },
-            allowedTypes: fileTypes,
-          };
+        if(file.type.includes('image') && file.type !== 'image/svg+xml'){
+
+            const input = await file.arrayBuffer();
+            const buffer = Buffer.from(input);
+
+            const metaInformation = await metadata(buffer);
+
+            const transformedImage = await transform(buffer, {
+                resize: {
+                    width: metaInformation.width > 2048 ? 2048 : metaInformation.width,
+                    height: metaInformation.height > 2048 ? 2048 : metaInformation.height,
+                }
+            });
+
+            const thumbnailBuffer = await transform(buffer, {
+                resize: {
+                    width: 512,
+                    height: 512,
+                    fit: 'Cover' as any,
+                    filter: 'Bilinear' as any
+                },
+                output: {
+                    format: 'webp',
+                    webp: {
+                        quality: 75
+                    }
+                }
+            });
+
+            await Bun.write(path, transformedImage);
+            await Bun.write(thumbnailPath, thumbnailBuffer);
+        }
+        else if(file.type.includes('application/pdf')){
+            const input = await body.file.arrayBuffer();
+            const buffer = Buffer.from(input);
+            const document = await pdf(buffer, { scale: 1 });
+
+            const indexPage = await document.getPage(1)
+            const indexPageBuffer = Buffer.from(indexPage)
+
+            const thumbnailBuffer = await transform(indexPageBuffer, {
+                resize: {
+                    width: 512,
+                    height: 512,
+                    fit: 'Cover' as any,
+                    filter: 'Bilinear' as any
+                },
+                output: {
+                    format: 'webp',
+                    webp: {
+                        quality: 75
+                    }
+                }
+            });
+
+            await Bun.write(path, indexPageBuffer);
+            await Bun.write(thumbnailPath, thumbnailBuffer);
+
+        }
+        else{
+            await Bun.write(path, file);
+        }
 
         return {
             message: 'File uploaded successfully',
@@ -150,9 +212,8 @@ uploadRoutes
 .post('/upload/s3', async ({body, status}: {body: any, status: any})=> {
     try{
 
-        console.log(body.file?.type)
-
         const isFiletypeValid = fileTypes.includes(body.file?.type)
+
         if(!isFiletypeValid) return status(415, {
             message: 'Unsupported Media Type',
             error: 'Now Allowed',
@@ -164,21 +225,75 @@ uploadRoutes
         const {name, size, type} = body.file
         const key = Bun.randomUUIDv7() + '.' + name.split('.').pop();
         const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
-        const thumbnailPath = 'storage/temp/' + thumbnail
-        const arrayBuffer = await body.file.arrayBuffer()
-        const buffer = Buffer.from(arrayBuffer)
-       
-        await minioClient.putObject(bucket, key, buffer, size, type)
+        
+        if(type.includes('image') && type !== 'image/svg+xml'){
 
-        if(type.includes('image')){
+            const input = await body.file.arrayBuffer();
+            const buffer = Buffer.from(input);
 
-            //await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
+            const metaInformation = await metadata(buffer);
+
+            const transformedImage = await transform(buffer, {
+                resize: {
+                    width: metaInformation.width > 2048 ? 2048 : metaInformation.width,
+                    height: metaInformation.height > 2048 ? 2048 : metaInformation.height,
+                }
+            });
+
+            const thumbnailBuffer = await transform(buffer, {
+                resize: {
+                    width: 512,
+                    height: 512,
+                    fit: 'Cover' as any,
+                    filter: 'Bilinear' as any
+                },
+                output: {
+                    format: 'webp',
+                    webp: {
+                        quality: 75
+                    }
+                }
+            });
+
+            await minioClient.putObject(bucket, key, transformedImage, size, type)
+
+            await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
 
         }
+        else if(type.includes('application/pdf')){
 
-        if(type.includes('video')){
+            const input = await body.file.arrayBuffer();
+            const buffer = Buffer.from(input);
+            const document = await pdf(buffer, { scale: 1 });
+
+            const indexPage = await document.getPage(1)
+            const indexPageBuffer = Buffer.from(indexPage)
+
+            const thumbnailBuffer = await transform(indexPageBuffer, {
+                resize: {
+                    width: 512,
+                    height: 512,
+                    fit: 'Cover' as any,
+                    filter: 'Bilinear' as any
+                },
+                output: {
+                    format: 'webp',
+                    webp: {
+                        quality: 75
+                    }
+                }
+            });
             
+            await minioClient.putObject(bucket, key, buffer, size, type)
+            thumbnailBuffer && await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
+
         }
+        else {
+            const arrayBuffer = await body.file.arrayBuffer()
+            const buffer = Buffer.from(arrayBuffer)
+            await minioClient.putObject(bucket, key, buffer, size, type)
+        }
+
 
 
         return {
