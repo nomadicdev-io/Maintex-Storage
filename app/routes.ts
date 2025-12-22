@@ -2,8 +2,14 @@ import { Elysia, file } from 'elysia';
 import fileTypes from './config/upload-types.json'
 import { minioClient } from '.';
 import { healthcheckPlugin } from 'elysia-healthcheck';
-import sharp from 'sharp';
 import { readdir } from "node:fs/promises";
+import { 
+    transform, 
+    metadata, 
+    blurhash,
+    resize,
+    toWebp 
+  } from 'bun-image-turbo';
 
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
@@ -103,35 +109,19 @@ uploadRoutes
     try{
 
         console.log(body)
-        
-        const isFiletypeValid = fileTypes.includes(body.file?.type)
-        if(!isFiletypeValid) return status(415, {
-            message: 'Unsupported Media Type',
-            error: 'Now Allowed',
-            status: false,
-            code: 415
-        })        
+             
         const file = body.file
         const name = Bun.randomUUIDv7() + '.' + file.name.split('.').pop();
         const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
         const path = body.path ? body.path + name : 'storage/uploads/' + name
         const thumbnailPath = body.path ? body.path + thumbnail : 'storage/uploads/' + thumbnail
 
-        await Bun.write(path, file);
-
-        if(file.type.includes('image')){
-            await sharp(path)
-            .resize(512, 512, {
-                fit: "cover",
-                position: "centre",
-            })
-            .webp({
-                quality: 82,
-                effort: 6,
-                smartSubsample: true,
-            })
-            .toFile(thumbnailPath);
-        }
+        const CONFIG = {
+            maxFileSize: 10 * 1024 * 1024, // 10MB
+            thumbnail: { width: 300, height: 300 },
+            webp: { quality: 85 },
+            allowedTypes: fileTypes,
+          };
 
         return {
             message: 'File uploaded successfully',
@@ -180,18 +170,8 @@ uploadRoutes
         await minioClient.putObject(bucket, key, buffer, size, type)
 
         if(type.includes('image')){
-            const thumbnailBuffer = await sharp(arrayBuffer)
-            .resize(512, 512, {
-                fit: "cover",
-                position: "centre",
-            })
-            .webp({
-                quality: 82,
-                effort: 6,
-                smartSubsample: true,
-            })
-            .toBuffer();
-            await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
+
+            //await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
 
         }
 

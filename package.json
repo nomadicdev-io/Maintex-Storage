@@ -18,12 +18,11 @@
     "@elysiajs/openapi": "^1.4.12",
     "@elysiajs/server-timing": "^1.4.0",
     "@elysiajs/static": "^1.4.7",
-    "@img/sharp-linux-x64": "^0.34.5",
     "@rasla/logify": "^5.1.2",
+    "bun-image-turbo": "^1.2.2",
     "chalk": "^5.6.2",
     "elysia": "^1.4.19",
     "elysia-healthcheck": "^1.0.0",
-    "minio": "^8.0.6",
-    "sharp": "^0.34.5"
+    "minio": "^8.0.6"
   }
 }

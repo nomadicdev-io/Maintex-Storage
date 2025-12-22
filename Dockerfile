@@ -7,7 +7,8 @@ COPY package.json package.json
 COPY bun.lock bun.lock
 
 RUN bun install
-RUN bun install --cpu=x64 --os=linux --libc=glibc sharp
+RUN bun add bun-image-turbo-darwin-x64 bun-image-turbo-linux-x64-musl bun-image-turbo-darwin-arm64
+
 
 COPY ./app ./app
 COPY ./public ./public
