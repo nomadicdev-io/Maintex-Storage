@@ -34,11 +34,7 @@ FROM gcr.io/distroless/base
 
 WORKDIR /app
 
-COPY --from=build /app/server ./server
 COPY --from=build /app/public ./public
-COPY --from=build /app/storage ./storage
-COPY --from=build /app/drive ./drive
-COPY --from=build /app/logs ./logs
 
 # Set timezone to Asia/Dubai
 ENV TZ=Asia/Dubai
