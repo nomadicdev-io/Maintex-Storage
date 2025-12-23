@@ -9,6 +9,8 @@ COPY bun.lock bun.lock
 RUN bun install
 RUN bun install bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-arm64-gnu
 
+RUN apt-get update && apt-get install -y nasm cmake build-essential
+
 COPY ./app ./app
 COPY ./public ./public
 
