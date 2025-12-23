@@ -39,6 +39,7 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/storage ./storage
 COPY --from=build /app/drive ./drive
 COPY --from=build /app/logs ./logs
+COPY --from=build /app/node_modules ./node_modules
 
 # Set timezone to Asia/Dubai
 ENV TZ=Asia/Dubai
