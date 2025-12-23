@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json package.json
 COPY bun.lock bun.lock
 
-RUN bun install
+RUN bun install --production
 RUN bun install bun-image-turbo-linux-arm64-gnu bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-x64-musl
 
 RUN apt-get update && apt-get install -y nasm cmake build-essential
@@ -22,13 +22,7 @@ COPY ./public ./public
 
 ENV NODE_ENV=production
 
-RUN bun build \
-	--compile \
-	--minify-whitespace \
-	--minify-syntax \
-	--target bun-linux-x64 \
-	--outfile server \
-	app/index.ts
+RUN bun run build
 
 RUN mkdir -p storage drive logs \
     && touch logs/server.log \
@@ -53,4 +47,4 @@ VOLUME ["/app/storage", "/app/drive", "/app/logs"]
 
 EXPOSE 8180
 
-CMD ["./server"]
+CMD ["bun", "run", "build/index.js"]
