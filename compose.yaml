@@ -39,6 +39,7 @@ services:
       - storage-data:/app/storage
       - logs-data:/app/logs
       - drive-data:/app/drive
+      - public-data:/app/public
     networks:
       - app-network
     # Logging configuration
@@ -50,8 +51,7 @@ services:
     # Security options
     security_opt:
       - no-new-privileges:true
-    # Read-only root filesystem (except volumes)
-    read_only: true
+    # Allow writes to app directories (storage/public/logs/drive are volumes)
     tmpfs:
       - /tmp
 
@@ -63,3 +63,4 @@ volumes:
   storage-data:
   drive-data:
   logs-data:
+  public-data:
