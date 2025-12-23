@@ -7,9 +7,15 @@ COPY package.json package.json
 COPY bun.lock bun.lock
 
 RUN bun install
-RUN bun install bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-arm64-gnu
+RUN bun install @bun-image-turbo/linux-x64-gnu @bun-image-turbo/linux-arm64-gnu
 
 RUN apt-get update && apt-get install -y nasm cmake build-essential
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY ./app ./app
 COPY ./public ./public
