@@ -5,8 +5,9 @@ WORKDIR /app
 # Cache packages installation
 COPY package.json package.json
 COPY bun.lock bun.lock
+COPY build.ts build.ts
 
-RUN bun install --production
+RUN bun install --frozen-lockfile --production
 RUN bun install bun-image-turbo-linux-arm64-gnu bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-x64-musl
 
 RUN apt-get update && apt-get install -y nasm cmake build-essential
