@@ -18,6 +18,7 @@ RUN bun build \
 	--compile \
 	--minify-whitespace \
 	--minify-syntax \
+	--target bun-linux-x64 \
 	--outfile server \
 	app/index.ts
 
