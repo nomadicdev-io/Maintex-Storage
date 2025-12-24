@@ -4,6 +4,7 @@ import { minioClient } from '.';
 import { healthcheckPlugin } from 'elysia-healthcheck';
 import { readdir } from "node:fs/promises";
 import { pdf } from "pdf-to-img";
+import createThumbnail, { createVideoThumbnail } from './converter';
 
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
@@ -100,6 +101,33 @@ uploadRoutes
     //     code: 401
     // })
 })
+.onBeforeHandle(async ({body, status})=> {
+    const isFiletypeValid = fileTypes.includes(body.file?.type)
+
+    if(!isFiletypeValid) return status(415, {
+        message: 'Unsupported Media Type',
+        error: 'Now Allowed',
+        status: false,
+        code: 415
+    })        
+
+})
+.get('/get/all/files', async ({status}: {status: any})=> {
+    try{
+        const files =await readdir('storage', {recursive: true})
+        return {
+            status: true,
+            code: 'GET_ALL_FILES_SUCCESS',
+            statusCode: 200,
+            message: 'Get All Files Success',
+            data: files
+        }
+    }catch(error){
+        console.log(error)
+    }
+})
+.post('/upload/static/chunks', 'Uploaded Chunks')
+.post('/upload/static/chunks', 'Uploaded S3 Chunks')
 .post('/upload/static', async ({body, status}: {body: any, status: any})=> {
     try{
 
@@ -118,70 +146,38 @@ uploadRoutes
         const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
         const thumbnailPath = body.path ? body.path + thumbnail : 'storage/uploads/' + thumbnail
 
-        // if(file.type.includes('image') && file.type !== 'image/svg+xml'){
+        const input = await file.arrayBuffer();
+        const buffer = Buffer.from(input);
 
-        //     const input = await file.arrayBuffer();
-        //     const buffer = Buffer.from(input);
+        if(file.type.includes('image')){
 
-        //     const metaInformation = await metadata(buffer);
+            await Bun.write(path, buffer);
 
-        //     const transformedImage = await transform(buffer, {
-        //         resize: {
-        //             width: metaInformation.width > 2048 ? 2048 : metaInformation.width,
-        //             height: metaInformation.height > 2048 ? 2048 : metaInformation.height,
-        //         }
-        //     });
-
-        //     const thumbnailBuffer = await transform(buffer, {
-        //         resize: {
-        //             width: 512,
-        //             height: 512,
-        //             fit: 'Cover' as any,
-        //             filter: 'Bilinear' as any
-        //         },
-        //         output: {
-        //             format: 'webp',
-        //             webp: {
-        //                 quality: 75
-        //             }
-        //         }
-        //     });
-
-        //     await Bun.write(path, transformedImage);
-        //     await Bun.write(thumbnailPath, thumbnailBuffer);
-        // }
-        // else 
-        // if(file.type.includes('application/pdf')){
-        //     const input = await body.file.arrayBuffer();
-        //     const buffer = Buffer.from(input);
-        //     const document = await pdf(buffer, { scale: 1 });
-
-        //     const indexPage = await document.getPage(1)
-        //     const indexPageBuffer = Buffer.from(indexPage)
-
-        //     const thumbnailBuffer = await transform(indexPageBuffer, {
-        //         resize: {
-        //             width: 512,
-        //             height: 512,
-        //             fit: 'Cover' as any,
-        //             filter: 'Bilinear' as any
-        //         },
-        //         output: {
-        //             format: 'webp',
-        //             webp: {
-        //                 quality: 75
-        //             }
-        //         }
-        //     });
-
-        //     await Bun.write(path, indexPageBuffer);
-        //     await Bun.write(thumbnailPath, thumbnailBuffer);
-
-        // }
-        // else{
+            const thumbnail = await createThumbnail(buffer);
+            await Bun.write(thumbnailPath, thumbnail);
+        }
+        else if(file.type.includes('application/pdf')){
             
-        // }
-        await Bun.write(path, file);
+            await Bun.write(path, buffer);
+
+            const document = await pdf(buffer, { scale: 1 });
+
+            const indexPage = await document.getPage(1)
+            const indexPageBuffer = Buffer.from(indexPage)
+
+            const thumbnail = await createThumbnail(indexPageBuffer);
+            await Bun.write(thumbnailPath, thumbnail);
+
+        } else if(file.type.includes('video')){
+
+            await Bun.write(path, buffer);
+            const thumbnail = await createVideoThumbnail(path, thumbnailPath);
+            console.log('Thumbnail created', thumbnail)
+            
+        }
+        else {
+            await Bun.write(path, file);
+        }
 
         return {
             message: 'File uploaded successfully',
@@ -209,104 +205,70 @@ uploadRoutes
 .post('/upload/s3', async ({body, status}: {body: any, status: any})=> {
     try{
 
-        const isFiletypeValid = fileTypes.includes(body.file?.type)
-
-        if(!isFiletypeValid) return status(415, {
-            message: 'Unsupported Media Type',
-            error: 'Now Allowed',
-            status: false,
-            code: 415
-        })        
 
         const bucket = process.env.F3_BUCKET as string
-        const {name, size, type} = body.file
-        const key = Bun.randomUUIDv7() + '.' + name.split('.').pop();
+        const file = body.file
+        const key = Bun.randomUUIDv7() + '.' + file.name.split('.').pop();
         const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
-        
-        // if(type.includes('image') && type !== 'image/svg+xml'){
+        const tempPath = 'storage/temp/' + Bun.randomUUIDv7() + '.' + file.name.split('.').pop();
+        const tempThumbnailPath = 'storage/temp/thumbnail-' + Bun.randomUUIDv7() + '.webp';
 
-        //     const input = await body.file.arrayBuffer();
-        //     const buffer = Buffer.from(input);
+        const input = await file.arrayBuffer();
+        const buffer = Buffer.from(input);
 
-        //     const metaInformation = await metadata(buffer);
 
-        //     const transformedImage = await transform(buffer, {
-        //         resize: {
-        //             width: metaInformation.width > 2048 ? 2048 : metaInformation.width,
-        //             height: metaInformation.height > 2048 ? 2048 : metaInformation.height,
-        //         }
-        //     });
+        if(file.type.includes('image')){
 
-        //     const thumbnailBuffer = await transform(buffer, {
-        //         resize: {
-        //             width: 512,
-        //             height: 512,
-        //             fit: 'Cover' as any,
-        //             filter: 'Bilinear' as any
-        //         },
-        //         output: {
-        //             format: 'webp',
-        //             webp: {
-        //                 quality: 75
-        //             }
-        //         }
-        //     });
+            await minioClient.putObject(bucket, key, buffer, file.size, file.type)
 
-        //     await minioClient.putObject(bucket, key, transformedImage, size, type)
+            const thumbnailBuffer = await createThumbnail(buffer);
+            await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
 
-        //     await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
+        }
+        else if(file.type.includes('application/pdf')){
 
-        // }
-        // else if(type.includes('application/pdf')){
+            await minioClient.putObject(bucket, key, buffer, file.size, file.type)
 
-        //     const input = await body.file.arrayBuffer();
-        //     const buffer = Buffer.from(input);
-        //     const document = await pdf(buffer, { scale: 1 });
+            const document = await pdf(buffer, { scale: 1 });
+            const indexPage = await document.getPage(1)
+            const indexPageBuffer = Buffer.from(indexPage)
 
-        //     const indexPage = await document.getPage(1)
-        //     const indexPageBuffer = Buffer.from(indexPage)
-
-        //     const thumbnailBuffer = await transform(indexPageBuffer, {
-        //         resize: {
-        //             width: 512,
-        //             height: 512,
-        //             fit: 'Cover' as any,
-        //             filter: 'Bilinear' as any
-        //         },
-        //         output: {
-        //             format: 'webp',
-        //             webp: {
-        //                 quality: 75
-        //             }
-        //         }
-        //     });
+            const thumbnailBuffer = await createThumbnail(indexPageBuffer);
             
-        //     await minioClient.putObject(bucket, key, buffer, size, type)
-        //     thumbnailBuffer && await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
+            await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
 
-        // }
-        // else {
-        //     const arrayBuffer = await body.file.arrayBuffer()
-        //     const buffer = Buffer.from(arrayBuffer)
-        //     await minioClient.putObject(bucket, key, buffer, size, type)
-        // }
+        }
+        else if(file.type.includes('video')){
 
-        const arrayBuffer = await body.file.arrayBuffer()
-        const buffer = Buffer.from(arrayBuffer)
-        await minioClient.putObject(bucket, key, buffer, size, type)
+            await minioClient.putObject(bucket, key, buffer, file.size, file.type)
+            await Bun.write(tempPath, buffer);
+            const thumbnail = await createVideoThumbnail(tempPath, tempThumbnailPath);
 
+            const indexPageBuffer = Buffer.from(tempThumbnailPath)
+            await minioClient.putObject(bucket, key, indexPageBuffer, file.size, file.type)
+
+            console.log('Thumbnail created', thumbnail)
+
+            Bun.file(tempPath).delete()
+            Bun.file(tempThumbnailPath).delete()
+            
+        }
+        else {
+            await minioClient.putObject(bucket, key, buffer, file.size, file.type)
+        }
 
         return {
             status: true,
             code: 'UPLOAD_SUCCESS',
             statusCode: 200,
             message: 'Upload Success',
+            link: process.env.API_ENDPOINT + '/s3/url?key=' + key + '&bucket=' + bucket,
             data: {
-                name: name,
+                name: file.name,
                 key: key,
                 bucket: bucket,
-                type: type,
-                size: size,
+                type: file.type,
+                size: file.size,
                 isStatic: false,
                 thumbnail: thumbnail
             }
@@ -322,22 +284,7 @@ uploadRoutes
         })
     }
 })
-.get('/get/all/files', async ({status}: {status: any})=> {
-    try{
-        const files =await readdir('storage', {recursive: true})
-        return {
-            status: true,
-            code: 'GET_ALL_FILES_SUCCESS',
-            statusCode: 200,
-            message: 'Get All Files Success',
-            data: files
-        }
-    }catch(error){
-        console.log(error)
-    }
-})
-.post('/upload/static/chunks', 'Uploaded Chunks')
-.post('/upload/static/chunks', 'Uploaded S3 Chunks')
+
 
 export {
     staticRoutes,

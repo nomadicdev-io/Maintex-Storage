@@ -6,8 +6,7 @@ import * as Minio from 'minio'
 
 export const minioClient = new Minio.Client({
     endPoint: process.env.F3_ENDPOINT as string,
-    port: parseInt(process.env.F3_PORT as string),
-    useSSL: false,
+    useSSL: true,
     accessKey: process.env.F3_ACCESS_KEY,
     secretKey: process.env.F3_SECRET_KEY,
     region: 'us-east-1'
