@@ -25,82 +25,17 @@ staticRoutes
     })
 )
 
-const uploadRoutes = new Elysia({
-    name: 'Maintex Storage Upload Routes',
-    prefix: '/api/v1',
+const generateRoutes = new Elysia({
+    name: 'Maintex Storage Generate Routes',
+    prefix: '/generate',
 })
 
-uploadRoutes
-.get('/s3/url', async ({query, status, redirect}: {query: any, status: any, redirect: any})=> {
-    try{
-        const {key, bucket} = query
-
-        if(!key || !bucket) return status(400, {
-            message: 'Bad Request',
-            error: 'Bad Request, Key and Bucket are required',
-            status: false,
-            code: 400
-        })
-
-        const url = await minioClient.presignedGetObject(query.bucket, query.key)
-        return redirect(url)
-    }catch(error){
-        console.log(error)
-    }
+const uploadFile = new Elysia({
+    name: 'Maintex Storage Upload File',
+    prefix: '/upload',
 })
-.get('/uploads/file/*', async ({params, status}: {params: any, status: any})=> {
-    try{
-        if(!params) return status(400, {
-            message: 'Bad Request',
-            error: 'Bad Request, Path is required',
-            status: false,
-            code: 400
-        })
-        return file(params['*'])
-    }catch(error){
-        console.log(error)
-        return status(500, {
-            message: 'Internal Server Error',
-            error: 'Internal Server Error',
-            status: false,
-            code: 500
-        })
-    }
-})
-.onBeforeHandle(async ({bearer, jwt, set, status, headers}: {bearer: any, jwt: any, set: any, status: any, headers: any})=> {
-  
-    const secretKey = headers['x-app-secret']
-    if(!secretKey) return status(401, {
-        message: 'Unauthorized, Secret Key is required',
-        error: 'Unauthorized',
-        status: false,
-        code: 401
-    })
 
-    if(secretKey !== process.env.APP_SECRET) return status(401, {    
-        message: 'Unauthorized',
-        error: 'Unauthorized, Secret Key is invalid',
-        status: false,
-        code: 401
-    })
-
-    // if(!bearer) return status(401, {
-    //     message: 'Unauthorized',
-    //     error: 'Unauthorized, Token is required',
-    //     status: false,
-    //     code: 401
-    // })
-
-    // const verify = await jwt.verify(bearer as string)
-    // console.log(verify)
-
-    // if(!verify) return status(401, {
-    //     message: 'Unauthorized',
-    //     error: 'Unauthorized, Token is invalid',
-    //     status: false,
-    //     code: 401
-    // })
-})
+uploadFile
 .onBeforeHandle(async ({body, status})=> {
     const isFiletypeValid = fileTypes.includes(body.file?.type)
 
@@ -112,23 +47,7 @@ uploadRoutes
     })        
 
 })
-.get('/get/all/files', async ({status}: {status: any})=> {
-    try{
-        const files =await readdir('storage', {recursive: true})
-        return {
-            status: true,
-            code: 'GET_ALL_FILES_SUCCESS',
-            statusCode: 200,
-            message: 'Get All Files Success',
-            data: files
-        }
-    }catch(error){
-        console.log(error)
-    }
-})
-.post('/upload/static/chunks', 'Uploaded Chunks')
-.post('/upload/static/chunks', 'Uploaded S3 Chunks')
-.post('/upload/static', async ({body, status}: {body: any, status: any})=> {
+.post('/static', async ({body, status}: {body: any, status: any})=> {
     try{
 
         const isFiletypeValid = fileTypes.includes(body.file?.type)
@@ -202,7 +121,7 @@ uploadRoutes
         })
     }
 })
-.post('/upload/s3', async ({body, status}: {body: any, status: any})=> {
+.post('/s3', async ({body, status}: {body: any, status: any})=> {
     try{
 
 
@@ -285,6 +204,98 @@ uploadRoutes
     }
 })
 
+const uploadRoutes = new Elysia({
+    name: 'Maintex Storage Upload Routes',
+    prefix: '/api/v1',
+})
+
+uploadRoutes
+.get('/s3/url', async ({query, status, redirect}: {query: any, status: any, redirect: any})=> {
+    try{
+        const {key, bucket} = query
+
+        if(!key || !bucket) return status(400, {
+            message: 'Bad Request',
+            error: 'Bad Request, Key and Bucket are required',
+            status: false,
+            code: 400
+        })
+
+        const url = await minioClient.presignedGetObject(query.bucket, query.key)
+        return redirect(url)
+    }catch(error){
+        console.log(error)
+    }
+})
+.get('/uploads/file/*', async ({params, status}: {params: any, status: any})=> {
+    try{
+        if(!params) return status(400, {
+            message: 'Bad Request',
+            error: 'Bad Request, Path is required',
+            status: false,
+            code: 400
+        })
+        return file(params['*'])
+    }catch(error){
+        console.log(error)
+        return status(500, {
+            message: 'Internal Server Error',
+            error: 'Internal Server Error',
+            status: false,
+            code: 500
+        })
+    }
+})
+.onBeforeHandle(async ({bearer, jwt, set, status, headers}: {bearer: any, jwt: any, set: any, status: any, headers: any})=> {
+  
+    const secretKey = headers['x-app-secret']
+    if(!secretKey) return status(401, {
+        message: 'Unauthorized, Secret Key is required',
+        error: 'Unauthorized',
+        status: false,
+        code: 401
+    })
+
+    if(secretKey !== process.env.APP_SECRET) return status(401, {    
+        message: 'Unauthorized',
+        error: 'Unauthorized, Secret Key is invalid',
+        status: false,
+        code: 401
+    })
+
+    // if(!bearer) return status(401, {
+    //     message: 'Unauthorized',
+    //     error: 'Unauthorized, Token is required',
+    //     status: false,
+    //     code: 401
+    // })
+
+    // const verify = await jwt.verify(bearer as string)
+    // console.log(verify)
+
+    // if(!verify) return status(401, {
+    //     message: 'Unauthorized',
+    //     error: 'Unauthorized, Token is invalid',
+    //     status: false,
+    //     code: 401
+    // })
+})
+.get('/get/all/files', async ({status}: {status: any})=> {
+    try{
+        const files =await readdir('storage', {recursive: true})
+        return {
+            status: true,
+            code: 'GET_ALL_FILES_SUCCESS',
+            statusCode: 200,
+            message: 'Get All Files Success',
+            data: files
+        }
+    }catch(error){
+        console.log(error)
+    }
+})
+.use(uploadFile)
+.use(generateRoutes)
 
 export {
     staticRoutes,
