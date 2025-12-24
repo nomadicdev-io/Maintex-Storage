@@ -242,15 +242,15 @@ uploadRoutes
 
             await minioClient.putObject(bucket, key, buffer, file.size, file.type)
             await Bun.write(tempPath, buffer);
-            const thumbnail = await createVideoThumbnail(tempPath, tempThumbnailPath);
+            // const thumbnail = await createVideoThumbnail(tempPath, tempThumbnailPath);
 
-            const indexPageBuffer = Buffer.from(tempThumbnailPath)
-            await minioClient.putObject(bucket, key, indexPageBuffer, file.size, file.type)
+            // const indexPageBuffer = Buffer.from(tempThumbnailPath)
+            // await minioClient.putObject(bucket, key, indexPageBuffer, file.size, file.type)
 
-            console.log('Thumbnail created', thumbnail)
+            // console.log('Thumbnail created', thumbnail)
 
-            Bun.file(tempPath).delete()
-            Bun.file(tempThumbnailPath).delete()
+            // Bun.file(tempPath).delete()
+            // Bun.file(tempThumbnailPath).delete()
             
         }
         else {
