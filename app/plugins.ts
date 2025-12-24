@@ -25,7 +25,28 @@ plugins
     } as LoggerOptions) as any
 )
 .use(serverTiming())
-.use(cors())
+.use(cors({
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization', 
+        'Accept',
+        'X-App-Secret', 
+        'X-App-Platform', 
+        'X-App-Device',
+        'X-App-Version',
+        'X-Requested-With',
+        'X-App-TimeZone',
+        'X-App-OS',
+        'Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers',
+        'X-Maintex-Access-Token'
+    ],
+    maxAge: 600
+}))
 .use(bearer())
 .use(
     jwt({

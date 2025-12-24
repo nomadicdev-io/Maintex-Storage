@@ -7,13 +7,12 @@ import { tmpdir } from "node:os";
 
 const createThumbnail = async (file: Buffer) => {
 
-    let thumbnail = sharp(file)
+    let thumbnail = await sharp(file)
     .resize({ width: 512, height: 512, fit: 'cover' })
     .webp({ quality: 75 })
+    .toBuffer()
 
-    const thumbnailBuffer = await thumbnail.toBuffer()
-    
-    return thumbnailBuffer
+    return thumbnail
 }
 
 export const createVideoThumbnail = async (videoPath: any, outputPath: any)=> {

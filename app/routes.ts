@@ -126,12 +126,14 @@ uploadFile
     try{
 
 
-        const bucket = process.env.F3_BUCKET as string
+        const bucket = body?.bucket || process.env.F3_BUCKET as string
         const file = body.file
         const key = Bun.randomUUIDv7() + '.' + file.name.split('.').pop();
         const thumbnail = 'thumbnail-' + Bun.randomUUIDv7() + '.webp'
         const tempPath = 'storage/temp/' + Bun.randomUUIDv7() + '.' + file.name.split('.').pop();
-        const tempThumbnailPath = 'storage/temp/thumbnail-' + Bun.randomUUIDv7() + '.webp';
+
+        const isBucketExists = await minioClient.bucketExists(bucket)
+        if(!isBucketExists) await minioClient.makeBucket(bucket)
 
         const input = await file.arrayBuffer();
         const buffer = Buffer.from(input);
@@ -141,8 +143,8 @@ uploadFile
 
             await minioClient.putObject(bucket, key, buffer, file.size, file.type)
 
-            const thumbnailBuffer = await createThumbnail(buffer);
-            await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
+            // const thumbnailBuffer = await createThumbnail(buffer);
+            // await minioClient.putObject(bucket, thumbnail, thumbnailBuffer as any, thumbnailBuffer.length, 'image/webp' as any)
 
         }
         else if(file.type.includes('application/pdf')){
@@ -249,7 +251,7 @@ uploadRoutes
 })
 .onBeforeHandle(async ({bearer, jwt, set, status, headers}: {bearer: any, jwt: any, set: any, status: any, headers: any})=> {
   
-    const secretKey = headers['maintex-access-token']
+    const secretKey = headers['x-maintex-access-token']
     if(!secretKey) return status(401, {
         message: 'Unauthorized, Secret Key is required',
         error: 'Unauthorized',
@@ -258,8 +260,6 @@ uploadRoutes
     })
 
     const verify = await verifyApplicationToken(secretKey)
-
-    console.log(verify)
 
     if(!verify) return status(401, {
         message: 'Unauthorized',
