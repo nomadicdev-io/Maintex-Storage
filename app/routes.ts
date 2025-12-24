@@ -5,6 +5,7 @@ import { healthcheckPlugin } from 'elysia-healthcheck';
 import { readdir } from "node:fs/promises";
 import { pdf } from "pdf-to-img";
 import createThumbnail, { createVideoThumbnail } from './converter';
+import { verifyApplicationToken } from './tokenGenerator';
 
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
@@ -248,7 +249,7 @@ uploadRoutes
 })
 .onBeforeHandle(async ({bearer, jwt, set, status, headers}: {bearer: any, jwt: any, set: any, status: any, headers: any})=> {
   
-    const secretKey = headers['x-app-secret']
+    const secretKey = headers['maintex-access-token']
     if(!secretKey) return status(401, {
         message: 'Unauthorized, Secret Key is required',
         error: 'Unauthorized',
@@ -256,12 +257,17 @@ uploadRoutes
         code: 401
     })
 
-    if(secretKey !== process.env.APP_SECRET) return status(401, {    
+    const verify = await verifyApplicationToken(secretKey)
+
+    console.log(verify)
+
+    if(!verify) return status(401, {
         message: 'Unauthorized',
-        error: 'Unauthorized, Secret Key is invalid',
+        error: 'Unauthorized, Access Token is invalid',
         status: false,
         code: 401
     })
+
 
     // if(!bearer) return status(401, {
     //     message: 'Unauthorized',
