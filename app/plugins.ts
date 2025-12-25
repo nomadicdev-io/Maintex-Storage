@@ -15,7 +15,6 @@ const plugins = new Elysia({
 })
 
 plugins
-.use(ip())
 .use(
     logger({
         console: true,
