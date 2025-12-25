@@ -21,7 +21,7 @@ const app = new Elysia({
 app
 .use(openapiPlugin)
 .use(plugins)
-.onAfterResponse(requestLogger as any)
+// .onAfterResponse(requestLogger as any)
 .use(staticRoutes)
 .use(uploadRoutes)
 // .get('/token', async ({jwt}: {jwt: any})=> {
