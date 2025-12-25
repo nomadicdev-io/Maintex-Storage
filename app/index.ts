@@ -3,6 +3,7 @@ import { BunAdapter } from 'elysia/adapter/bun'
 import plugins, { openapiPlugin } from './plugins';
 import { staticRoutes, uploadRoutes } from './routes';
 import * as Minio from 'minio'
+import { requestLogger } from './requestLogger';
 
 export const minioClient = new Minio.Client({
     endPoint: process.env.F3_ENDPOINT as string,
@@ -18,10 +19,11 @@ const app = new Elysia({
 })
 
 app
+.use(openapiPlugin)
 .use(plugins)
+.onAfterResponse(requestLogger as any)
 .use(staticRoutes)
 .use(uploadRoutes)
-.use(openapiPlugin)
 // .get('/token', async ({jwt}: {jwt: any})=> {
 //     const token = await jwt.sign({
 //         id: '68c9e29876475905a9167e38',

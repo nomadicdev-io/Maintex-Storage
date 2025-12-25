@@ -7,12 +7,14 @@ import chalk from 'chalk'
 import { logger, LoggerOptions } from "@rasla/logify";
 import { serverTiming } from '@elysiajs/server-timing'
 import { openapi } from '@elysiajs/openapi'
+import { ip } from "elysia-ip";
 
 const plugins = new Elysia({
     name: 'Maintex Storage Plugins',
 })
 
 plugins
+.use(ip())
 .use(
     logger({
         console: true,

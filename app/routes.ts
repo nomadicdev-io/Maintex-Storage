@@ -6,6 +6,7 @@ import { readdir } from "node:fs/promises";
 import { pdf } from "pdf-to-img";
 import createThumbnail, { createVideoThumbnail } from './converter';
 import { verifyApplicationToken } from './tokenGenerator';
+import subscribe from './subscribe';
 
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
@@ -16,6 +17,7 @@ staticRoutes
 .get('/logo', file('public/logo-dark.svg'))
 .get('/server-image', file('public/server.svg'))
 .get('/favicon.ico', file('public/favicon.ico'))
+.use(subscribe)
 .use(
     healthcheckPlugin({
       prefix: '/api/v1/health',
