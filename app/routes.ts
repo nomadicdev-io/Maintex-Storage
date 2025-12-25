@@ -254,22 +254,22 @@ uploadRoutes
 })
 .onBeforeHandle(async ({bearer, jwt, set, status, headers}: {bearer: any, jwt: any, set: any, status: any, headers: any})=> {
   
-    const secretKey = headers['x-maintex-access-token']
-    if(!secretKey) return status(401, {
-        message: 'Unauthorized, Secret Key is required',
-        error: 'Unauthorized',
-        status: false,
-        code: 401
-    })
+    // const secretKey = headers['x-maintex-access-token']
+    // if(!secretKey) return status(401, {
+    //     message: 'Unauthorized, Secret Key is required',
+    //     error: 'Unauthorized',
+    //     status: false,
+    //     code: 401
+    // })
 
-    const verify = await verifyApplicationToken(secretKey)
+    // const verify = await verifyApplicationToken(secretKey)
 
-    if(!verify) return status(401, {
-        message: 'Unauthorized',
-        error: 'Unauthorized, Access Token is invalid',
-        status: false,
-        code: 401
-    })
+    // if(!verify) return status(401, {
+    //     message: 'Unauthorized',
+    //     error: 'Unauthorized, Access Token is invalid',
+    //     status: false,
+    //     code: 401
+    // })
 
 
     // if(!bearer) return status(401, {
