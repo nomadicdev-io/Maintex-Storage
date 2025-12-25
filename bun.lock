@@ -16,7 +16,6 @@
         "chalk": "^5.6.2",
         "elysia": "^1.4.19",
         "elysia-healthcheck": "^1.0.0",
-        "elysia-ip": "^1.0.10",
         "elysia-rate-limit": "^4.4.2",
         "fast-jwt": "^6.1.0",
         "fluent-ffmpeg": "^2.1.3",
@@ -187,8 +186,6 @@
     "elysia": ["elysia@1.4.19", "", { "dependencies": { "cookie": "^1.1.1", "exact-mirror": "0.2.5", "fast-decode-uri-component": "^1.0.1", "memoirist": "^0.4.0" }, "peerDependencies": { "@sinclair/typebox": ">= 0.34.0 < 1", "@types/bun": ">= 1.2.0", "file-type": ">= 20.0.0", "openapi-types": ">= 12.0.0", "typescript": ">= 5.0.0" }, "optionalPeers": ["@types/bun", "typescript"] }, "sha512-DZb9y8FnWyX5IuqY44SvqAV0DjJ15NeCWHrLdgXrKgTPDPsl3VNwWHqrEr9bmnOCpg1vh6QUvAX/tcxNj88jLA=="],
 
     "elysia-healthcheck": ["elysia-healthcheck@1.0.0", "", { "peerDependencies": { "elysia": ">=1.3.0" } }, "sha512-wvrFp6L4+MQw53YamiSk4wS4/6SQvM690tqXLzH4sDJLtMOazIMX7kr5lUlBnJT4Gbi2652iGqnV/qEktJAFKw=="],
-
-    "elysia-ip": ["elysia-ip@1.0.10", "", { "peerDependencies": { "elysia": ">= 1.0.9" } }, "sha512-xmCxPOl4266sq6CLk5d82P3BZOatG9z0gMP473cYEnORssuopbEI8GAwpOhiaz69X76AOrkYgvCdLkqMJC49dQ=="],
 
     "elysia-rate-limit": ["elysia-rate-limit@4.4.2", "", { "dependencies": { "@alloc/quick-lru": "5.2.0", "debug": "4.3.4" }, "peerDependencies": { "elysia": ">= 1.0.0" } }, "sha512-zrtqk3BDsCZ6VhJDJMmpkGsSqs6ZFaYNU+wTHqqEprUxVa3wA5/QV9N/y1V0f34n9gz3Gpd8vlVe2CbKOWHCQA=="],
 

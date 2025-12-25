@@ -7,7 +7,6 @@ import chalk from 'chalk'
 import { logger, LoggerOptions } from "@rasla/logify";
 import { serverTiming } from '@elysiajs/server-timing'
 import { openapi } from '@elysiajs/openapi'
-import { ip } from "elysia-ip";
 import { rateLimit } from 'elysia-rate-limit';
 
 const plugins = new Elysia({
