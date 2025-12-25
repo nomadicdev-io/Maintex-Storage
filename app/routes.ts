@@ -252,7 +252,7 @@ uploadRoutes
         })
     }
 })
-.onBeforeHandle(async ({bearer, jwt, set, status, headers}: {bearer: any, jwt: any, set: any, status: any, headers: any})=> {
+// .onBeforeHandle(async ({bearer, jwt, set, status, headers}: {bearer: any, jwt: any, set: any, status: any, headers: any})=> {
   
     // const secretKey = headers['x-maintex-access-token']
     // if(!secretKey) return status(401, {
@@ -288,7 +288,7 @@ uploadRoutes
     //     status: false,
     //     code: 401
     // })
-})
+// })
 .get('/get/all/files', async ({status}: {status: any})=> {
     try{
         const files =await readdir('storage', {recursive: true})
