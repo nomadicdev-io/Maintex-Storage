@@ -3,7 +3,6 @@ import { BunAdapter } from 'elysia/adapter/bun'
 import plugins, { openapiPlugin } from './plugins';
 import { staticRoutes, uploadRoutes } from './routes';
 import * as Minio from 'minio'
-import { requestLogger } from './requestLogger';
 
 export const minioClient = new Minio.Client({
     endPoint: process.env.F3_ENDPOINT as string,

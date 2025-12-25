@@ -17,25 +17,7 @@ staticRoutes
 .get('/logo', file('public/logo-dark.svg'))
 .get('/server-image', file('public/server.svg'))
 .get('/favicon.ico', file('public/favicon.ico'))
-.get('/assets/*', async ({params, status}: {params: any, status: any})=> {
-    try{
-        if(!params) return status(400, {
-            message: 'Bad Request',
-            error: 'Bad Request, Path is required',
-            status: false,
-            code: 400
-        })
-        return file('public/' + params['*'])
-    }catch(error){
-        console.log(error)
-        return status(500, {
-            message: 'Internal Server Error',
-            error: 'Internal Server Error',
-            status: false,
-            code: 500
-        })
-    }
-})
+.get('/assets/*', ({params}: {params: any})=> file('public/' + params['*']))
 .use(subscribe)
 .use(
     healthcheckPlugin({
