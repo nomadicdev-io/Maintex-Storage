@@ -9,7 +9,7 @@ export const minioClient = new Minio.Client({
     useSSL: true,
     accessKey: process.env.F3_ACCESS_KEY,
     secretKey: process.env.F3_SECRET_KEY,
-    region: 'us-east-1'
+    region: process.env.F3_REGION || 'us-east-1'
 })
 
 const app = new Elysia({
@@ -20,17 +20,7 @@ const app = new Elysia({
 app
 .use(openapiPlugin)
 .use(plugins)
-// .onAfterResponse(requestLogger as any)
 .use(staticRoutes)
 .use(uploadRoutes)
-// .get('/token', async ({jwt}: {jwt: any})=> {
-//     const token = await jwt.sign({
-//         id: '68c9e29876475905a9167e38',
-//         name: 'Admin Maintex',
-//         email: 'admin@maintex.pro',
-//         usernane: 'maintex-admin'
-//     })
-//     return token
-// })
 
 export default app;

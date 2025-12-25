@@ -8,6 +8,7 @@ import { logger, LoggerOptions } from "@rasla/logify";
 import { serverTiming } from '@elysiajs/server-timing'
 import { openapi } from '@elysiajs/openapi'
 import { ip } from "elysia-ip";
+import { rateLimit } from 'elysia-rate-limit';
 
 const plugins = new Elysia({
     name: 'Maintex Storage Plugins',
@@ -33,10 +34,10 @@ plugins
     credentials: true,
     allowedHeaders: [
         'Content-Type',
-        'Authorization', 
+        'Authorization',
         'Accept',
-        'X-App-Secret', 
-        'X-App-Platform', 
+        'X-App-Secret',
+        'X-App-Platform',
         'X-App-Device',
         'X-App-Version',
         'X-Requested-With',
@@ -48,6 +49,10 @@ plugins
         'X-Maintex-Access-Token'
     ],
     maxAge: 600
+}))
+.use(rateLimit({
+    duration: 60000, // 1 minute
+    max: 10 // max 10 requests per minute per IP
 }))
 .use(bearer())
 .use(

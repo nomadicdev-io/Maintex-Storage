@@ -8,6 +8,8 @@ import createThumbnail, { createVideoThumbnail } from './converter';
 import { verifyApplicationToken } from './tokenGenerator';
 import subscribe from './subscribe';
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
 const staticRoutes = new Elysia({
     name: 'Maintex Storage Static Routes',
 })
@@ -41,15 +43,29 @@ const uploadFile = new Elysia({
 
 uploadFile
 .onBeforeHandle(async ({body, status})=> {
-    const isFiletypeValid = fileTypes.includes(body.file?.type)
+    if (!body || !(body as any).file) return status(400, {
+        message: 'File required',
+        error: 'Bad Request',
+        status: false,
+        code: 400
+    });
+
+    const file = (body as any).file;
+    const isFiletypeValid = fileTypes.includes(file.type);
 
     if(!isFiletypeValid) return status(415, {
         message: 'Unsupported Media Type',
-        error: 'Now Allowed',
+        error: 'Not Allowed',
         status: false,
         code: 415
-    })        
+    });
 
+    if(file.size > MAX_FILE_SIZE) return status(413, {
+        message: 'File too large',
+        error: 'Payload Too Large',
+        status: false,
+        code: 413
+    });
 })
 .post('/static', async ({body, status}: {body: any, status: any})=> {
     try{
@@ -252,43 +268,6 @@ uploadRoutes
         })
     }
 })
-// .onBeforeHandle(async ({bearer, jwt, set, status, headers}: {bearer: any, jwt: any, set: any, status: any, headers: any})=> {
-  
-    // const secretKey = headers['x-maintex-access-token']
-    // if(!secretKey) return status(401, {
-    //     message: 'Unauthorized, Secret Key is required',
-    //     error: 'Unauthorized',
-    //     status: false,
-    //     code: 401
-    // })
-
-    // const verify = await verifyApplicationToken(secretKey)
-
-    // if(!verify) return status(401, {
-    //     message: 'Unauthorized',
-    //     error: 'Unauthorized, Access Token is invalid',
-    //     status: false,
-    //     code: 401
-    // })
-
-
-    // if(!bearer) return status(401, {
-    //     message: 'Unauthorized',
-    //     error: 'Unauthorized, Token is required',
-    //     status: false,
-    //     code: 401
-    // })
-
-    // const verify = await jwt.verify(bearer as string)
-    // console.log(verify)
-
-    // if(!verify) return status(401, {
-    //     message: 'Unauthorized',
-    //     error: 'Unauthorized, Token is invalid',
-    //     status: false,
-    //     code: 401
-    // })
-// })
 .get('/get/all/files', async ({status}: {status: any})=> {
     try{
         const files =await readdir('storage', {recursive: true})
