@@ -56,7 +56,7 @@ plugins
 .use(
     jwt({
         name: 'jwt',
-        secret: process.env.JWT_SECRET || '9vUEk6GpQ52WVweU8xJTpZqSqRSuAPh9TMQ',
+        secret: process.env.JWT_SECRET as string,
         exp: '720d'
     })
 )

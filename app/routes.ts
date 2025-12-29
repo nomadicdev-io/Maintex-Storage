@@ -7,6 +7,7 @@ import { pdf } from "pdf-to-img";
 import createThumbnail, { createVideoThumbnail } from './converter';
 import { verifyApplicationToken } from './tokenGenerator';
 import subscribe from './subscribe';
+import accessTokenValidator from './accessTokenValidator';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
@@ -43,6 +44,7 @@ const uploadFile = new Elysia({
 })
 
 uploadFile
+.onBeforeHandle(accessTokenValidator as any)
 .onBeforeHandle(async ({body, status})=> {
     if (!body || !(body as any).file) return status(400, {
         message: 'File required',
