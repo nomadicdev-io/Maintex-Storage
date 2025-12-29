@@ -37,8 +37,8 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/files ./files
 
 RUN mkdir -p storage drive logs \
-    && chmod -R 755 storage drive \
     && useradd -m appuser && chown -R appuser:appuser /app \
+    && chmod -R 755 storage drive logs \
     && touch /app/logs/server.log \
     && chown -R appuser:appuser /app/logs/server.log
 
