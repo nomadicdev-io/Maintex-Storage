@@ -12,16 +12,16 @@ const plugins = new Elysia({
 })
 
 plugins
-.use(
-    logger({
-        console: true,
-        file: true,
-        filePath: './logs/server.log',
-        level: 'debug', 
-        skip: ['/health', '/metrics'],
-        includeIp: true,
-    } as LoggerOptions) as any
-)
+// .use(
+//     logger({
+//         console: true,
+//         file: true,
+//         filePath: './logs/server.log',
+//         level: 'debug', 
+//         skip: ['/health', '/metrics'],
+//         includeIp: true,
+//     } as LoggerOptions) as any
+// )
 .use(serverTiming())
 .use(cors({
     origin: true,
