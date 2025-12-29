@@ -36,6 +36,7 @@ RUN mkdir -p storage drive logs \
     && touch logs/server.log \
     && chmod -R 755 storage drive \
     && chmod -R 775 logs \
+    && chmod -R 775 public \
     && useradd -m appuser && chown -R appuser:appuser /app
 
 # Set timezone to Asia/Dubai
