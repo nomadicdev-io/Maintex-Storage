@@ -44,7 +44,6 @@ RUN if [ ! -d /app/logs ]; then \
       mkdir /app/logs; \
       touch /app/logs/server.log; \
       && chown -R appuser:appuser /app/logs
-    fi
 
 # Set timezone to Asia/Dubai
 ENV TZ=Asia/Dubai
