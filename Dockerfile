@@ -1,4 +1,4 @@
-FROM oven/bun:1 AS build
+FROM oven/bun:latest AS build
 
 WORKDIR /app
 
@@ -8,7 +8,6 @@ COPY bun.lock bun.lock
 COPY build.ts build.ts
 
 RUN bun install --frozen-lockfile --production
-RUN bun install bun-image-turbo-linux-arm64-gnu bun-image-turbo-linux-x64-gnu bun-image-turbo-linux-x64-musl
 
 RUN apt-get update && apt-get install -y \
     nasm \
@@ -21,13 +20,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./app ./app
-COPY ./public ./public
 
 ENV NODE_ENV=production
 
 RUN bun run build
 
-FROM oven/bun:1 AS runtime
+FROM oven/bun:latest AS runtime
 
 WORKDIR /app
 
