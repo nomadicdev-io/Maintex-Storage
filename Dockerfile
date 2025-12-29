@@ -32,7 +32,6 @@ FROM oven/bun:1 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/build ./build
-COPY --from=build /app/public ./public
 COPY --from=build /app/node_modules ./node_modules
 
 RUN mkdir -p storage drive logs \
