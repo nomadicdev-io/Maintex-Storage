@@ -36,7 +36,10 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/public ./public
 COPY --from=build /app/files ./files
 
-RUN mkdir -p /app/storage /app/drive /app/logs \
+RUN apt-get update && apt-get install -y \
+    su-exec \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /app/storage/uploads /app/storage/temp /app/storage/assets /app/drive /app/logs \
     && useradd -m appuser \
     && chown -R appuser:appuser /app \
     && chmod -R 775 /app/storage /app/drive /app/logs \
@@ -44,15 +47,16 @@ RUN mkdir -p /app/storage /app/drive /app/logs \
     && chown appuser:appuser /app/logs/server.log \
     && chmod 664 /app/logs/server.log
 
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Set timezone to Asia/Dubai
 ENV TZ=Asia/Dubai
 ENV NODE_ENV=production
 
-USER appuser
-
 VOLUME ["/app/storage", "/app/drive", "/app/logs"]
 
 EXPOSE 8180
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["bun", "run", "build/index.js"]
