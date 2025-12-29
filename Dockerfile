@@ -39,7 +39,7 @@ COPY --from=build /app/files ./files
 RUN mkdir -p storage drive logs \
     && touch logs/server.log \
     && chmod -R 755 storage drive \
-    && chmod -R 775 logs \
+    && chmod -R 755 logs \
     && useradd -m appuser && chown -R appuser:appuser /app
 
 # Set timezone to Asia/Dubai
