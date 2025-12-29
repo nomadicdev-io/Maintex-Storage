@@ -38,12 +38,10 @@ COPY --from=build /app/files ./files
 
 RUN mkdir -p storage drive logs \
     && chmod -R 755 storage drive \
-    && useradd -m appuser && chown -R appuser:appuser /app
+    && useradd -m appuser && chown -R appuser:appuser /app \
+    && touch /app/logs/server.log \
+    && chown -R appuser:appuser /app/logs/server.log
 
-RUN if [ ! -d /app/logs ]; then \
-      mkdir /app/logs; \
-      touch /app/logs/server.log; \
-      && chown -R appuser:appuser /app/logs
 
 # Set timezone to Asia/Dubai
 ENV TZ=Asia/Dubai
