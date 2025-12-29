@@ -20,6 +20,7 @@ staticRoutes
 .get('/server-image', file('public/server.svg'))
 .get('/favicon.ico', file('public/favicon.ico'))
 .get('/assets/*', ({params}: {params: any})=> file('public/' + params['*']))
+.get('/files/*', ({params}: {params: any})=> file('files/' + params['*']))
 .use(subscribe)
 .use(
     healthcheckPlugin({

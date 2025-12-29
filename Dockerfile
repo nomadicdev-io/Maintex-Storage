@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY ./app ./app
 COPY ./public ./public
+COPY ./files ./files
 
 ENV NODE_ENV=production
 
@@ -32,6 +33,8 @@ WORKDIR /app
 
 COPY --from=build /app/build ./build
 COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/public ./public
+COPY --from=build /app/files ./files
 
 RUN mkdir -p storage drive logs \
     && touch logs/server.log \
