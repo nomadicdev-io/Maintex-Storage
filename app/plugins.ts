@@ -3,11 +3,9 @@ import { bearer } from '@elysiajs/bearer'
 import { cors } from '@elysiajs/cors'
 import { jwt } from '@elysiajs/jwt'
 import { staticPlugin } from '@elysiajs/static'
-import chalk from 'chalk'
 import { logger, LoggerOptions } from "@rasla/logify";
 import { serverTiming } from '@elysiajs/server-timing'
 import { openapi } from '@elysiajs/openapi'
-import { rateLimit } from 'elysia-rate-limit';
 
 const plugins = new Elysia({
     name: 'Maintex Storage Plugins',
@@ -22,7 +20,6 @@ plugins
         level: 'debug', 
         skip: ['/health', '/metrics'],
         includeIp: true,
-        format: chalk.bgBlue.white('[{timestamp}]') +  chalk.bold.green(' {level}') + chalk.bold.yellow('[{method}]') + ' - ' + chalk.red('[{path}]') + ' - ' + chalk.bold.magenta('{statusCode} ') + chalk.bold.white('{ip}'),
     } as LoggerOptions) as any
 )
 .use(serverTiming())
@@ -47,10 +44,6 @@ plugins
         'X-Maintex-Access-Token'
     ],
     maxAge: 600
-}))
-.use(rateLimit({
-    duration: 60000, // 1 minute
-    max: 10 // max 10 requests per minute per IP
 }))
 .use(bearer())
 .use(
