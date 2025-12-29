@@ -36,11 +36,13 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/public ./public
 COPY --from=build /app/files ./files
 
-RUN mkdir -p storage drive logs \
-    && useradd -m appuser && chown -R appuser:appuser /app \
-    && chmod -R 755 storage drive logs \
+RUN mkdir -p /app/storage /app/drive /app/logs \
+    && useradd -m appuser \
+    && chown -R appuser:appuser /app \
+    && chmod -R 775 /app/storage /app/drive /app/logs \
     && touch /app/logs/server.log \
-    && chown -R appuser:appuser /app/logs/server.log
+    && chown appuser:appuser /app/logs/server.log \
+    && chmod 664 /app/logs/server.log
 
 
 # Set timezone to Asia/Dubai
