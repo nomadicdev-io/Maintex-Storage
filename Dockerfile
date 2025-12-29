@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./app ./app
+COPY ./public ./public
 
 ENV NODE_ENV=production
 
